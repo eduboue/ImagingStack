@@ -1,0 +1,34 @@
+# macOS
+.DS_Store
+
+# Python
+__pycache__/
+*.pyc
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Virtual environments
+venv/
+.venv/
+
+# Imaging/data files – keep these OUT of git
+*.nii
+*.nii.gz
+*.nrrd
+*.nd2
+*.tif
+*.tiff
+*.bag
+*.avi
+*.mp4
+*.h5
+*.hdf5
+*.csv
+*.zip
+
+# Data directories
+data/
+datasets/
+raw/
+sample_data/
