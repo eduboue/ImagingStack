@@ -4,7 +4,6 @@ A lightweight, general-purpose Python class for loading, representing, downsampl
 Supports **NRRD**, **NIfTI (.nii / .nii.gz)**, and **ND2** microscopy files, and provides a unified interface to work with confocal, two-photon, or multi-channel volumetric imaging data.
 
 ---
-
 ## Features
 
 ### ✔ Load Multiple Imaging Formats
