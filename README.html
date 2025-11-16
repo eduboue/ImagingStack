@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="UTF-8">
+            <title>ImagingStack</title>
+            <style>
+/* From extension vscode.github */
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+.vscode-dark img[src$=\#gh-light-mode-only],
+.vscode-light img[src$=\#gh-dark-mode-only],
+.vscode-high-contrast:not(.vscode-high-contrast-light) img[src$=\#gh-light-mode-only],
+.vscode-high-contrast-light img[src$=\#gh-dark-mode-only] {
+	display: none;
+}
+
+</style>
+            
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/markdown.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/highlight.css">
+<style>
+            body {
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe WPC', 'Segoe UI', system-ui, 'Ubuntu', 'Droid Sans', sans-serif;
+                font-size: 14px;
+                line-height: 1.6;
+            }
+        </style>
+        <style>
+.task-list-item {
+    list-style-type: none;
+}
+
+.task-list-item-checkbox {
+    margin-left: -20px;
+    vertical-align: middle;
+    pointer-events: none;
+}
+</style>
+<style>
+:root {
+  --color-note: #0969da;
+  --color-tip: #1a7f37;
+  --color-warning: #9a6700;
+  --color-severe: #bc4c00;
+  --color-caution: #d1242f;
+  --color-important: #8250df;
+}
+
+</style>
+<style>
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-note: #2f81f7;
+    --color-tip: #3fb950;
+    --color-warning: #d29922;
+    --color-severe: #db6d28;
+    --color-caution: #f85149;
+    --color-important: #a371f7;
+  }
+}
+
+</style>
+<style>
+.markdown-alert {
+  padding: 0.5rem 1rem;
+  margin-bottom: 16px;
+  color: inherit;
+  border-left: .25em solid #888;
+}
+
+.markdown-alert>:first-child {
+  margin-top: 0
+}
+
+.markdown-alert>:last-child {
+  margin-bottom: 0
+}
+
+.markdown-alert .markdown-alert-title {
+  display: flex;
+  font-weight: 500;
+  align-items: center;
+  line-height: 1
+}
+
+.markdown-alert .markdown-alert-title .octicon {
+  margin-right: 0.5rem;
+  display: inline-block;
+  overflow: visible !important;
+  vertical-align: text-bottom;
+  fill: currentColor;
+}
+
+.markdown-alert.markdown-alert-note {
+  border-left-color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-note .markdown-alert-title {
+  color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-important {
+  border-left-color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-important .markdown-alert-title {
+  color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-warning {
+  border-left-color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-warning .markdown-alert-title {
+  color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-tip {
+  border-left-color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-tip .markdown-alert-title {
+  color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-caution {
+  border-left-color: var(--color-caution);
+}
+
+.markdown-alert.markdown-alert-caution .markdown-alert-title {
+  color: var(--color-caution);
+}
+
+</style>
+        
+        </head>
+        <body class="vscode-body vscode-light">
+            <h1 id="imagingstack">ImagingStack</h1>
+<p>A lightweight, general-purpose Python class for loading, representing, downsampling, and saving multi-channel microscopy image stacks.<br>
+Supports <strong>NRRD</strong>, <strong>NIfTI (.nii / .nii.gz)</strong>, and <strong>ND2</strong> microscopy files, and provides a unified interface to work with confocal, two-photon, or multi-channel volumetric imaging data.</p>
+<hr>
+<h2 id="repository-structure">Repository Structure</h2>
+<p>This repo is organized around a small, importable module plus an example Jupyter notebook that shows how to use it.</p>
+<ul>
+<li><strong><code>ImagingStack.py</code></strong> – core module implementing the <code>ImagingStack</code> class.</li>
+<li><strong><code>ImageStack_workflow.ipynb</code></strong> – <strong>usage notebook</strong> that walks through loading, downsampling, and saving imaging data with <code>ImagingStack</code>.</li>
+<li><em>(Optional, recommended additions)</em>
+<ul>
+<li><code>data/</code> – example NRRD, NIfTI, or ND2 files (not tracked if large).</li>
+<li><code>tests/</code> – unit tests for loading, downsampling, and IO.</li>
+</ul>
+</li>
+</ul>
+<p>The notebook is the best starting point if you want to see the class in action end-to-end.</p>
+<hr>
+<h2 id="features">Features</h2>
+<h3 id="-load-multiple-imaging-formats">✔ Load Multiple Imaging Formats</h3>
+<ul>
+<li><strong>NRRD</strong></li>
+<li><strong>NIfTI</strong> (<code>.nii</code>, <code>.nii.gz</code>)</li>
+<li><strong>ND2</strong> (Nikon microscopy format)</li>
+</ul>
+<h3 id="-multi-channel-support">✔ Multi-Channel Support</h3>
+<ul>
+<li>Up to <strong>three channels</strong> stored as aligned <code>(Z, Y, X)</code> NumPy arrays.</li>
+<li>Automatic detection and splitting of channels from 4D volume arrays and ND2 files.</li>
+</ul>
+<h3 id="-metadata-handling">✔ Metadata Handling</h3>
+<ul>
+<li>Stores and propagates metadata such as:
+<ul>
+<li>voxel size</li>
+<li><code>pixdim</code></li>
+<li><code>space directions</code></li>
+<li>ND2 acquisition metadata (axes, raw metadata blob)</li>
+</ul>
+</li>
+</ul>
+<h3 id="-downsampling">✔ Downsampling</h3>
+<p>Two methods:</p>
+<ul>
+<li><strong>Nearest-neighbor</strong> (fast subsampling via evenly spaced indices).</li>
+<li><strong>Average pooling</strong> (block-mean downsampling, like 3D binning).</li>
+</ul>
+<p>Each operates independently on all channels and updates metadata accordingly where possible.</p>
+<h3 id="-saving--exporting">✔ Saving / Exporting</h3>
+<p>Save any channel as:</p>
+<ul>
+<li><strong>NRRD</strong></li>
+<li><strong>NIfTI</strong></li>
+</ul>
+<p>Preserves or converts metadata appropriately for each file type (e.g., voxel size, <code>space directions</code>, <code>pixdim</code>).</p>
+<hr>
+<h2 id="installation">Installation</h2>
+<p>You can install the dependencies into a virtual environment or conda environment.</p>
+<pre><code class="language-bash">pip install numpy nibabel pynrrd nd2
+</code></pre>
+<p><code>ImagingStack.py</code> itself is just a single-file module; you can either:</p>
+<ul>
+<li>keep it in the same directory as your analysis scripts / notebooks, or</li>
+<li>install it as a package if you later decide to structure this as a full Python package.</li>
+</ul>
+<hr>
+<h2 id="quick-start">Quick Start</h2>
+<h3 id="1-import-and-load-a-volume">1. Import and Load a Volume</h3>
+<pre><code class="language-python"><span class="hljs-keyword">from</span> ImagingStack <span class="hljs-keyword">import</span> ImagingStack
+
+<span class="hljs-comment"># Load from NIfTI or NRRD</span>
+stack = ImagingStack.from_file(<span class="hljs-string">&quot;brain_volume.nii.gz&quot;</span>)
+<span class="hljs-built_in">print</span>(stack)
+</code></pre>
+<h3 id="2-load-from-an-nd2-microscopy-file">2. Load From an ND2 Microscopy File</h3>
+<pre><code class="language-python">stack = ImagingStack.from_nd2(<span class="hljs-string">&quot;experiment.nd2&quot;</span>)
+<span class="hljs-built_in">print</span>(stack.channel1.shape)  <span class="hljs-comment"># Z, Y, X</span>
+</code></pre>
+<h3 id="3-downsample-a-stack">3. Downsample a Stack</h3>
+<pre><code class="language-python"><span class="hljs-comment"># Uniform 2x downsample in all dimensions using block averaging</span>
+small = stack.downsample(scale=<span class="hljs-number">0.5</span>, method=<span class="hljs-string">&quot;average&quot;</span>)
+
+<span class="hljs-comment"># Or use nearest-neighbor</span>
+smaller_fast = stack.downsample(scale=<span class="hljs-number">0.25</span>, method=<span class="hljs-string">&quot;nearest&quot;</span>)
+</code></pre>
+<h3 id="4-save-a-channel-to-nifti-or-nrrd">4. Save a Channel to NIfTI or NRRD</h3>
+<pre><code class="language-python"><span class="hljs-comment"># Save channel 1 as NIfTI</span>
+small.to_file(<span class="hljs-string">&quot;output_downsampled.nii.gz&quot;</span>, channel=<span class="hljs-number">1</span>)
+
+<span class="hljs-comment"># Save channel 2 as NRRD</span>
+small.to_file(<span class="hljs-string">&quot;output_channel2.nrrd&quot;</span>, channel=<span class="hljs-number">2</span>)
+</code></pre>
+<p>For a more complete walkthrough—including inspecting metadata, visualizing slices, and comparing different downsampling methods—see the notebook:</p>
+<blockquote>
+<p><strong><code>ImageStack_workflow.ipynb</code></strong> – step-by-step usage guide with runnable examples.</p>
+</blockquote>
+<hr>
+<h2 id="api-overview">API Overview</h2>
+<h3 id="imagingstack-1"><code>ImagingStack</code></h3>
+<p>Core container holding up to three channels plus metadata.</p>
+<ul>
+<li>
+<p><strong>Attributes</strong></p>
+<ul>
+<li><code>channel1</code>, <code>channel2</code>, <code>channel3</code> – NumPy arrays with shape <code>(Z, Y, X)</code>.</li>
+<li><code>metadata</code> – dictionary for voxel size, acquisition info, and file-format-specific fields.</li>
+<li><code>data</code> – property alias for <code>channel1</code> (for backward compatibility).</li>
+</ul>
+</li>
+<li>
+<p><strong>Class Methods</strong></p>
+<ul>
+<li><code>ImagingStack.from_file(filename)</code><br>
+Load <code>.nrrd</code>, <code>.nii</code>, or <code>.nii.gz</code> and auto-detect/split channels.</li>
+<li><code>ImagingStack.from_nd2(filename, metadata=None)</code><br>
+Load an ND2 file, extract axes and metadata, and split channels into <code>(Z, Y, X)</code> arrays.</li>
+</ul>
+</li>
+<li>
+<p><strong>Instance Methods</strong></p>
+<ul>
+<li><code>downsample(scale=0.5, method=&quot;nearest&quot;)</code><br>
+Downsample all channels with either evenly spaced nearest-neighbor sampling or block-mean averaging.</li>
+<li><code>to_file(filename, fmt=None, channel=1)</code><br>
+Save a single channel as NRRD or NIfTI, with metadata mapped to the appropriate header fields.</li>
+</ul>
+</li>
+</ul>
+<hr>
+<h2 id="notes--caveats">Notes &amp; Caveats</h2>
+<ul>
+<li>Average downsampling assumes scale factors that correspond roughly to integer block sizes (e.g., 0.5 → block size 2, 0.25 → block size 4). Non-integer choices may lead to slightly unintuitive block sizes due to integer rounding.</li>
+<li>In average mode, edges may be trimmed so that each dimension is exactly divisible by the block size.</li>
+<li>Nearest-neighbor downsampling uses <code>np.linspace</code> to select evenly spaced indices along each axis.</li>
+<li>Metadata handling is conservative and designed to be “good enough” for most analysis workflows; if you rely on very strict header semantics, you may want to add tests or extensions specific to your pipeline.</li>
+</ul>
+<hr>
+<h2 id="future-extensions-ideas">Future Extensions (Ideas)</h2>
+<ul>
+<li>Add simple visualization helpers (e.g., max projection, slice viewers).</li>
+<li>Add CLI entry points for batch conversion and downsampling.</li>
+<li>Add unit tests and CI for loading/saving and metadata integrity.</li>
+<li>Turn this into an installable package with <code>pyproject.toml</code> and <code>src/</code> layout.</li>
+</ul>
+<hr>
+<h2 id="author">Author</h2>
+<p>Erik R. Duboué<br>
+Florida Atlantic University – Neuroscience &amp; Biology</p>
+<p>If you use this in a paper, talk, or teaching material, a short acknowledgment is always appreciated.</p>
+
+            
+            
+        </body>
+        </html>

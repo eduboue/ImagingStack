@@ -5,20 +5,6 @@ Supports **NRRD**, **NIfTI (.nii / .nii.gz)**, and **ND2** microscopy files, and
 
 ---
 
-## Repository Structure
-
-This repo is organized around a small, importable module plus an example Jupyter notebook that shows how to use it.
-
-- **`ImagingStack.py`** – core module implementing the `ImagingStack` class.
-- **`ImageStack_workflow.ipynb`** – **usage notebook** that walks through loading, downsampling, and saving imaging data with `ImagingStack`.
-- *(Optional, recommended additions)*
-  - `data/` – example NRRD, NIfTI, or ND2 files (not tracked if large).
-  - `tests/` – unit tests for loading, downsampling, and IO.
-
-The notebook is the best starting point if you want to see the class in action end-to-end.
-
----
-
 ## Features
 
 ### ✔ Load Multiple Imaging Formats
@@ -34,7 +20,7 @@ The notebook is the best starting point if you want to see the class in action e
 
 ### ✔ Metadata Handling
 
-- Stores and propagates metadata such as:
+- Stores and propagates metadata such as (will be specific to file type):
   - voxel size
   - `pixdim`
   - `space directions`
@@ -55,6 +41,7 @@ Save any channel as:
 
 - **NRRD**
 - **NIfTI**
+- **Compressed NIfTI (.nii.gz)**
 
 Preserves or converts metadata appropriately for each file type (e.g., voxel size, `space directions`, `pixdim`).
 
@@ -62,7 +49,7 @@ Preserves or converts metadata appropriately for each file type (e.g., voxel siz
 
 ## Installation
 
-You can install the dependencies into a virtual environment or conda environment.
+You can install the dependencies into a virtual environment or conda environment. This was made with Python 12
 
 ```bash
 pip install numpy nibabel pynrrd nd2
