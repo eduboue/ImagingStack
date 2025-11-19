@@ -218,7 +218,7 @@ class ImagingStack:
     def _load_nd2(filename: str) -> Tuple[Tuple[NDArray[np.float32], Optional[NDArray[np.float32]], Optional[NDArray[np.float32]]], Dict[str, Any]]:
         with ND2File(filename) as nd_file:
             data = nd_file.asarray()
-            axes = getattr(nd_file, "axes", "")
+            axes = ImagingStack._determine_nd2_axes(nd_file)
             nd_meta = getattr(nd_file, "metadata", None)
 
         channels = ImagingStack._split_channels_from_nd2(np.asarray(data, dtype=np.float32), axes)
@@ -230,6 +230,23 @@ class ImagingStack:
         if nd_meta is not None:
             metadata["nd2_metadata"] = str(nd_meta)
         return channels, metadata
+
+    @staticmethod
+    def _determine_nd2_axes(nd_file: ND2File) -> str:
+        """
+        Best-effort helper to recover the axis specification from an ND2 file.
+        Older nd2-reader versions sometimes omit the `axes` attribute, in which
+        case we fall back to constructing it from the ordered sizes mapping.
+        """
+        axes = getattr(nd_file, "axes", None) or ""
+        if axes:
+            return axes
+
+        sizes = getattr(nd_file, "sizes", None)
+        if isinstance(sizes, dict) and sizes:
+            return "".join(sizes.keys())
+
+        return ""
 
     # Internal function to write NIfTI
     def _write_nifti(self, filename: str, data: NDArray[np.float32]) -> None:
@@ -350,37 +367,52 @@ class ImagingStack:
         data: NDArray[np.float32],
         axes: str,
     ) -> Tuple[NDArray[np.float32], Optional[NDArray[np.float32]], Optional[NDArray[np.float32]]]:
-        if not axes:
-            return ImagingStack._split_channels_default(data)
+        axes = axes.upper() if axes else ""
+        if axes:
+            selectors = [slice(None)] * data.ndim
+            for idx, axis_name in enumerate(axes):
+                if axis_name not in {"C", "Z", "Y", "X"}:
+                    selectors[idx] = 0
+            trimmed = data[tuple(selectors)]
+            trimmed_axes = "".join(axis for axis in axes if axis in {"C", "Z", "Y", "X"})
 
-        axes = axes.upper()
-        selectors = [slice(None)] * data.ndim
-        for idx, axis_name in enumerate(axes):
-            if axis_name not in {"C", "Z", "Y", "X"}:
-                selectors[idx] = 0
-        trimmed = data[tuple(selectors)]
-        trimmed_axes = "".join(axis for axis in axes if axis in {"C", "Z", "Y", "X"})
+            channel_axis = trimmed_axes.find("C")
+            if channel_axis == -1:
+                channel_slices = [trimmed]
+                axis_without_channel = trimmed_axes
+            else:
+                num_channels = min(3, trimmed.shape[channel_axis])
+                channel_slices = [
+                    np.take(trimmed, idx, axis=channel_axis) for idx in range(num_channels)
+                ]
+                axis_without_channel = trimmed_axes.replace("C", "")
 
-        channel_axis = trimmed_axes.find("C")
-        if channel_axis == -1:
-            channel_slices = [trimmed]
-            axis_without_channel = trimmed_axes
-        else:
-            num_channels = min(3, trimmed.shape[channel_axis])
-            channel_slices = [
-                np.take(trimmed, idx, axis=channel_axis) for idx in range(num_channels)
+            zyx_parts = [
+                ImagingStack._ensure_zyx_orientation(slice_arr, axis_without_channel)
+                for slice_arr in channel_slices
             ]
-            axis_without_channel = trimmed_axes.replace("C", "")
 
-        zyx_parts = [
-            ImagingStack._ensure_zyx_orientation(slice_arr, axis_without_channel)
-            for slice_arr in channel_slices
-        ]
+            while len(zyx_parts) < 3:
+                zyx_parts.append(None)
 
-        while len(zyx_parts) < 3:
-            zyx_parts.append(None)
+            return zyx_parts[0], zyx_parts[1], zyx_parts[2]
 
-        return zyx_parts[0], zyx_parts[1], zyx_parts[2]
+        # Fallback: rely on rank only (for ND2 builds that don't populate axes metadata).
+        if data.ndim == 3:
+            ch1 = np.asarray(data)
+            return ch1, None, None
+
+        if data.ndim == 4:
+            # Assume axis order (Z, C, Y, X) and split along the second dimension.
+            num_channels = min(3, data.shape[1])
+            zyx_parts = [np.asarray(data[:, idx, ...]) for idx in range(num_channels)]
+            while len(zyx_parts) < 3:
+                zyx_parts.append(None)
+            return zyx_parts[0], zyx_parts[1], zyx_parts[2]
+
+        raise ValueError(
+            f"Unsupported ND2 array shape {data.shape}; unable to infer channels without axis metadata."
+        )
 
     @staticmethod
     def _ensure_zyx_orientation(data: NDArray[np.float32], axes: str) -> NDArray[np.float32]:
